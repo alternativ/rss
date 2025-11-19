@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Reader</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul class="tag-list" id="tagList">
+                <li class="tag-item active" data-tag="all">all</li>
+                <li class="tag-item" data-tag="news">news</li>
+                <li class="tag-item" data-tag="tech">tech</li>
+            </ul>
+            <button class="config-btn" id="configBtn">
+                <svg viewBox="-271 273 256 256" fill="currentColor">
+                    <path d="M-271,360v48.9c31.9,0,62.1,12.6,84.7,35.2c22.6,22.6,35.1,52.8,35.1,84.8v0.1h49.1c0-46.6-19-88.7-49.6-119.4C-182.2,379-224.4,360.1-271,360z"/>
+                    <path d="M-237,460.9c-9.4,0-17.8,3.8-24,10s-10,14.6-10,24c0,9.3,3.8,17.7,10,23.9c6.2,6.1,14.6,9.9,24,9.9s17.8-3.7,24-9.9s10-14.6,10-23.9c0-9.4-3.8-17.8-10-24C-219.2,464.7-227.6,460.9-237,460.9z"/>
+                    <path d="M-90.1,348.1c-46.3-46.4-110.2-75.1-180.8-75.1v48.9C-156.8,322-64.1,414.9-64,529h49C-15,458.4-43.7,394.5-90.1,348.1z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="main">
+            <div class="header">
+                <h1 class="header-title" id="headerTitle">all - 0 articles</h1>
+            </div>
+
+            <div class="articles-container">
+                <div class="articles-pages" id="articlePages"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn">Previous</button>
+        <button class="nav-btn" id="nextBtn">Next</button>
+    </div>
+
+    <div class="config-modal" id="configModal">
+        <div class="config-content">
+            <button class="modal-close-btn" id="closeConfigBtn">&times;</button>
+            <h2>Add Custom Feed</h2>
+            <div class="config-form">
+                <input type="text" id="feedName" placeholder="Feed name (e.g., My Blog)">
+                <input type="url" id="feedUrl" placeholder="Feed URL">
+                <textarea id="feedTags" placeholder="Tags (comma-separated, e.g., news, tech)"></textarea>
+                <button onclick="addFeed()">Add Feed</button>
+            </div>
+            <div class="config-feeds">
+                <h3>Custom Feeds</h3>
+                <div id="feedsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

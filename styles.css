@@ -290,6 +290,10 @@ html, body {
     z-index: 100;
 }
 
+body.ios .navigation {
+    display: none;
+}
+
 .nav-btn {
     background-color: var(--accent);
     color: white;

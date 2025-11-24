@@ -114,6 +114,61 @@ function saveReadProgress() {
     } catch (e) {}
 }
 
+function isIPhone() {
+    if (typeof window === 'undefined' || !window.navigator) {
+        return false;
+    }
+    return /iPhone/i.test(window.navigator.userAgent || '');
+}
+
+function setupSwipeNavigation() {
+    var container = document.querySelector('.articles-container');
+    if (!container || container.getAttribute('data-swipe-ready') === 'true') {
+        return;
+    }
+
+    container.setAttribute('data-swipe-ready', 'true');
+
+    var startX = 0;
+    var startY = 0;
+    var threshold = 50;
+
+    container.addEventListener('touchstart', function(e) {
+        if (!e.touches || e.touches.length !== 1) {
+            return;
+        }
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    container.addEventListener('touchend', function(e) {
+        if (!e.changedTouches || e.changedTouches.length !== 1) {
+            return;
+        }
+
+        var endX = e.changedTouches[0].clientX;
+        var endY = e.changedTouches[0].clientY;
+        var diffX = endX - startX;
+        var diffY = endY - startY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+            if (diffX < 0) {
+                nextArticle();
+            } else {
+                previousArticle();
+            }
+        }
+    }, { passive: true });
+}
+
+function enableIOSMode() {
+    if (!isIPhone()) {
+        return;
+    }
+    document.body.classList.add('ios');
+    setupSwipeNavigation();
+}
+
 function filterArticles() {
     if (currentTag === 'all') {
         filteredArticles = allArticles;
@@ -433,5 +488,6 @@ document.getElementById('nextBtn').addEventListener('click', nextArticle);
 loadReadProgress();
 setupTagNavigation();
 setupConfigModal();
+enableIOSMode();
 filterArticles();
 renderArticles();

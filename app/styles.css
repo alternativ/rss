@@ -123,6 +123,13 @@ html, body {
     opacity: 1;
 }
 
+@media (max-width: 768px) {
+    .sticky-article-title {
+        font-size: 0.9rem;
+        max-width: 85%;
+    }
+}
+
 .config-btn {
     background: none;
     border: none;
@@ -522,14 +529,17 @@ body.ios .nav-btn {
 ::-webkit-scrollbar {
     width: 0;
     height: 0;
+    display: none;
 }
 
 ::-webkit-scrollbar-track {
     background: transparent;
+    display: none;
 }
 
 ::-webkit-scrollbar-thumb {
     background: transparent;
+    display: none;
 }
 
 @media (max-width: 768px) {

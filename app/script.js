@@ -225,7 +225,17 @@ function trackScrollProgress(articleId, scrollElement) {
             } else if (readProgress[articleId] && readProgress[articleId].progress > 10) {
                 statusText = ' ' + readProgress[articleId].progress + '%';
             }
-            stickyTitle.textContent = articleIndex + '/' + articleTotal + '  ' + titleElement.textContent + statusText;
+            
+            var isMobile = window.innerWidth <= 768;
+            var titleText = titleElement.textContent;
+            
+            // On mobile, show compact format
+            if (isMobile) {
+                stickyTitle.textContent = articleIndex + '/' + articleTotal + ' ' + titleText + statusText;
+            } else {
+                stickyTitle.textContent = articleIndex + '/' + articleTotal + '  ' + titleText + statusText;
+            }
+            
             stickyTitle.classList.add('visible');
             headerTitle.classList.add('hidden');
         } else {

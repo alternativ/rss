@@ -7,7 +7,7 @@ var readProgress = {};
 var allArticles = [
     {
         id: 1,
-        title: 'The Future of Web Development',
+        title: 'The Future of Web Development - update forced',
         source: 'TechCrunch',
         date: '2025-11-18',
         author: 'Sarah Chen',

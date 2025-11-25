@@ -7,8 +7,5 @@ WORKDIR /app
 # Copy project files
 COPY . /app
 
-# Expose default http.server port
-EXPOSE 8000
-
 # Serve the static files using Python's built-in HTTP server
-CMD ["python", "-m", "http.server", "8000", "--bind", "0.0.0.0"]
+CMD ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]

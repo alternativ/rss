@@ -3,6 +3,7 @@ var currentArticleIndex = 0;
 var filteredArticles = [];
 
 var readProgress = {};
+var scrollPositions = {};
 
 var allArticles = [
     {
@@ -184,6 +185,9 @@ function trackScrollProgress(articleId, scrollElement) {
     var scrolled = scrollElement.scrollTop;
     var progress = scrollHeight > 0 ? (scrolled / scrollHeight) * 100 : 100;
     
+    // Save scroll position
+    scrollPositions[articleId] = scrolled;
+    
     var currentProgress = readProgress[articleId];
     var wasCompleted = currentProgress && currentProgress.completed;
     var completed = wasCompleted || progress >= 90;
@@ -195,28 +199,38 @@ function trackScrollProgress(articleId, scrollElement) {
     };
     saveReadProgress();
     
-    var indicator = scrollElement.querySelector('.read-indicator');
-    var title = scrollElement.querySelector('.article-title');
+    // Update scroll progress bar with smooth animation
+    var progressBar = document.getElementById('scrollProgressBar');
+    if (progressBar && scrollHeight > 0) {
+        progressBar.style.height = progress + '%';
+    }
     
-    if (completed) {
-        if (indicator) {
-            indicator.className = 'read-indicator read-complete';
-            indicator.textContent = '\u2713 Read';
-        } else if (title) {
-            var newIndicator = document.createElement('span');
-            newIndicator.className = 'read-indicator read-complete';
-            newIndicator.textContent = '\u2713 Read';
-            title.appendChild(newIndicator);
-        }
-    } else if (readProgress[articleId].progress > 10) {
-        if (indicator) {
-            indicator.className = 'read-indicator read-partial';
-            indicator.textContent = readProgress[articleId].progress + '% read';
-        } else if (title) {
-            var newIndicator = document.createElement('span');
-            newIndicator.className = 'read-indicator read-partial';
-            newIndicator.textContent = readProgress[articleId].progress + '% read';
-            title.appendChild(newIndicator);
+    // Track title visibility and show sticky title with buffer
+    var titleElement = scrollElement.querySelector('.article-title');
+    var headerTitle = document.getElementById('headerTitle');
+    var stickyTitle = document.getElementById('stickyTitle');
+    
+    if (titleElement && stickyTitle && headerTitle) {
+        var titleRect = titleElement.getBoundingClientRect();
+        var scrollContainerRect = scrollElement.getBoundingClientRect();
+        var buffer = 10; // pixels
+        
+        // Show sticky title if the original title has scrolled past (with buffer)
+        if (titleRect.bottom < scrollContainerRect.top + buffer) {
+            var articleIndex = currentArticleIndex + 1;
+            var articleTotal = filteredArticles.length;
+            var statusText = '';
+            if (completed) {
+                statusText = ' ✓';
+            } else if (readProgress[articleId] && readProgress[articleId].progress > 10) {
+                statusText = ' ' + readProgress[articleId].progress + '%';
+            }
+            stickyTitle.textContent = articleIndex + '/' + articleTotal + '  ' + titleElement.textContent + statusText;
+            stickyTitle.classList.add('visible');
+            headerTitle.classList.add('hidden');
+        } else {
+            stickyTitle.classList.remove('visible');
+            headerTitle.classList.remove('hidden');
         }
     }
 }
@@ -231,19 +245,9 @@ function renderArticles() {
         page.className = 'article-page';
         page.setAttribute('data-article-id', article.id);
         
-        var progress = readProgress[article.id];
-        var progressIndicator = '';
-        if (progress) {
-            if (progress.completed) {
-                progressIndicator = '<span class="read-indicator read-complete">✓ Read</span>';
-            } else if (progress.progress > 10) {
-                progressIndicator = '<span class="read-indicator read-partial">' + progress.progress + '% read</span>';
-            }
-        }
-        
         var html = '<img src="' + article.image + '" alt="' + article.title + '" class="article-image" onerror="this.style.display=\'none\'">';
         html += '<div class="article-header">';
-        html += '<h1 class="article-title">' + article.title + progressIndicator + '</h1>';
+        html += '<h1 class="article-title">' + article.title + '</h1>';
         html += '<div class="article-meta">';
         html += '<div class="article-meta-item"><span class="article-source">' + article.source + '</span></div>';
         html += '<div class="article-meta-item">' + article.date + '</div>';
@@ -428,7 +432,12 @@ function previousArticle() {
 
 function updateUI() {
     var headerTitle = document.getElementById('headerTitle');
+    var stickyTitle = document.getElementById('stickyTitle');
     headerTitle.textContent = currentTag + ' - ' + filteredArticles.length + ' articles';
+    
+    // Reset sticky title when changing articles
+    stickyTitle.classList.remove('visible');
+    headerTitle.classList.remove('hidden');
 
     var pages = document.querySelectorAll('.article-page');
     for (var i = 0; i < pages.length; i++) {
@@ -441,7 +450,28 @@ function updateUI() {
             var currentPage = pages[i];
             var articleId = currentPage.getAttribute('data-article-id');
             
+            // Reset progress bar
+            var progressBar = document.getElementById('scrollProgressBar');
+            if (progressBar) {
+                progressBar.style.height = '0%';
+            }
+            
+            // Restore scroll position or reset to top
             setTimeout(function(page, id) {
+                if (scrollPositions[id] !== undefined) {
+                    page.scrollTop = scrollPositions[id];
+                    // Update progress bar to match restored position
+                    var scrollHeight = page.scrollHeight - page.clientHeight;
+                    if (scrollHeight > 0) {
+                        var progress = (scrollPositions[id] / scrollHeight) * 100;
+                        if (progressBar) {
+                            progressBar.style.height = progress + '%';
+                        }
+                    }
+                } else {
+                    page.scrollTop = 0;
+                }
+                
                 var scrollHeight = page.scrollHeight - page.clientHeight;
                 if (scrollHeight <= 0 && page.style.display !== 'none') {
                     setTimeout(function() {
@@ -452,15 +482,6 @@ function updateUI() {
                                 lastRead: new Date().toISOString()
                             };
                             saveReadProgress();
-                            
-                            var indicator = page.querySelector('.read-indicator');
-                            var title = page.querySelector('.article-title');
-                            if (!indicator && title) {
-                                var newIndicator = document.createElement('span');
-                                newIndicator.className = 'read-indicator read-complete';
-                                newIndicator.textContent = '\u2713 Read';
-                                title.appendChild(newIndicator);
-                            }
                         }
                     }, 5000);
                 }

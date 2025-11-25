@@ -26,6 +26,7 @@
         <div class="main">
             <div class="header">
                 <h1 class="header-title" id="headerTitle">all - 0 articles</h1>
+                <div class="sticky-article-title" id="stickyTitle"></div>
             </div>
 
             <div class="articles-container">
@@ -34,10 +35,9 @@
         </div>
     </div>
 
-    <div class="navigation">
-        <button class="nav-btn" id="prevBtn">Previous</button>
-        <button class="nav-btn" id="nextBtn">Next</button>
-    </div>
+    <button class="nav-btn nav-btn-left" id="prevBtn">←</button>
+    <button class="nav-btn nav-btn-right" id="nextBtn">→</button>
+    <div class="scroll-progress"><div class="scroll-progress-bar" id="scrollProgressBar"></div></div>
 
     <div class="config-modal" id="configModal">
         <div class="config-content">
